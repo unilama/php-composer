@@ -96,7 +96,7 @@ public class ComposerInstaller extends ToolInstaller {
         }
 
         if( isComposerUpdateNeeded(filePath) ) {
-            if( composerSelfUpdate(filePath, node, log) && composerUpdateDeps(filePath, node, log) ) {
+            if( composerSelfUpdate(filePath, node, log) || composerUpdateDeps(filePath, node, log) ) {
                 filePath.child(COMPOSER_DEPENDENCIES_LAST_UPDATE).write(Long.toString(System.currentTimeMillis()), "UTF-8");
             }
         }
@@ -210,7 +210,7 @@ public class ComposerInstaller extends ToolInstaller {
 
     private boolean isComposerUpdateNeeded(FilePath filePath) throws IOException, InterruptedException {
         FilePath lastUpdateFile = filePath.child(COMPOSER_DEPENDENCIES_LAST_UPDATE);
-        return lastUpdateFile.exists() && Long.getLong(lastUpdateFile.readToString())+ TimeUnit.HOURS.toMillis(getComposerDepsRefreshHours()) > System.currentTimeMillis();
+        return !lastUpdateFile.exists() || Long.getLong(lastUpdateFile.readToString())+ TimeUnit.HOURS.toMillis(getComposerDepsRefreshHours()) > System.currentTimeMillis();
     }
 
     private boolean composerUpdateDeps(FilePath filePath, Node node, TaskListener log) throws IOException, InterruptedException {
